@@ -1,21 +1,29 @@
 <script setup lang="ts">
-// This starter template is using Vue 3 <script setup> SFCs
-// Check out https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup
-import HelloWorld from './components/HelloWorld.vue'
+import GameBox from "./components/GameBox.vue";
 </script>
 
 <template>
-  <img alt="Vue logo" src="./assets/logo.png" />
-  <HelloWorld msg="Hello Vue 3 + TypeScript + Vite" />
+  <div class="wrapper">
+    <GameBox :pos="{ x: 3, y: 1 }" />
+    <GameBox :pos="{ x: 2, y: 2 }" />
+    <GameBox :pos="{ x: 3, y: 2 }" />
+    <GameBox :pos="{ x: 4, y: 2 }" />
+    <GameBox :pos="{ x: 1, y: 3 }" />
+    <GameBox :pos="{ x: 2, y: 3 }" />
+    <GameBox :pos="{ x: 3, y: 3 }" />
+    <GameBox :pos="{ x: 4, y: 3 }" />
+    <GameBox :pos="{ x: 5, y: 3 }" />
+    <GameBox :pos="{ x: 2, y: 4 }" />
+    <GameBox :pos="{ x: 3, y: 4 }" />
+    <GameBox :pos="{ x: 4, y: 4 }" />
+    <GameBox :pos="{ x: 3, y: 5 }" />
+  </div>
 </template>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+<style lang="scss" scoped>
+.wrapper {
+  display: inline-grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(5, 1fr);
 }
 </style>
