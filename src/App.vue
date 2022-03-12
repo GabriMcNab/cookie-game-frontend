@@ -5,6 +5,7 @@
       :key="pos.toString()"
       :position="pos"
       :selected-borders="box.selectedBorders"
+      :external-borders="box.externalBorders"
       @click:border="handleBorderClick"
     />
   </div>
@@ -17,6 +18,27 @@ import { Border, Coordinates, GameBox } from "./types";
 
 const gameBoard = reactive(generateGameBoard(9));
 
+function generateGameBox(
+  col: number,
+  row: number,
+  elementsPerRow: number,
+  midPoint: number
+): GameBox {
+  const externalBorders: Border[] = [];
+
+  if (col === 1 || col === elementsPerRow) {
+    if (col === 1) externalBorders.push("west");
+    if (col === elementsPerRow) externalBorders.push("east");
+    if (row <= midPoint) externalBorders.push("north");
+    if (row >= midPoint) externalBorders.push("south");
+  }
+
+  return {
+    selectedBorders: new Set<Border>(externalBorders),
+    externalBorders: new Set<Border>(externalBorders),
+  };
+}
+
 function generateGameBoard(size: number): Map<Coordinates, GameBox> {
   const gameBoard: Map<Coordinates, GameBox> = new Map();
   const midPoint = (size + 1) / 2;
@@ -26,7 +48,8 @@ function generateGameBoard(size: number): Map<Coordinates, GameBox> {
     const offset = (size - elementsPerRow) / 2;
 
     for (let x = 1; x <= elementsPerRow; x++) {
-      gameBoard.set([x + offset, y], { selectedBorders: new Set() });
+      const gameBox = generateGameBox(x, y, elementsPerRow, midPoint);
+      gameBoard.set([x + offset, y], gameBox);
     }
 
     if (y < midPoint) {
@@ -89,6 +112,7 @@ function handleBorderClick(border: Border, position: Coordinates) {
   const adjacentBoxBorder = getOppositeBorder(border);
 
   const targetBox = gameBoard.get(position);
+  console.log(targetBox);
   if (targetBox) {
     targetBox.selectedBorders.add(border);
     gameBoard.set(position, targetBox);
@@ -97,10 +121,13 @@ function handleBorderClick(border: Border, position: Coordinates) {
   const adjacentBox = gameBoard.get(
     getMapPosition(adjacentBoxPosition, gameBoard) || [0, 0]
   );
+  console.log(adjacentBox);
   if (adjacentBox) {
     adjacentBox.selectedBorders.add(adjacentBoxBorder);
     gameBoard.set(adjacentBoxPosition, adjacentBox);
   }
+
+  console.log(targetBox, adjacentBox);
 }
 </script>
 

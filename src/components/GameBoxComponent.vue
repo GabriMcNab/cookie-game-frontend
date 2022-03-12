@@ -4,32 +4,17 @@
     :style="{ gridColumn: position[0], gridRow: position[1] }"
   >
     <div
-      class="GameBoxComponent__border GameBoxComponent__border--north"
-      :class="{
-        selected: selectedBorders.has('north'),
-      }"
-      @click="$emit('click:border', 'north', position)"
+      v-for="border in borders"
+      :key="border"
+      :class="`GameBoxComponent__border GameBoxComponent__border--${border} ${
+        selectedBorders.has(border) ? 'selected' : ''
+      }`"
+      @click="$emit('click:border', border, position)"
     ></div>
     <div
-      class="GameBoxComponent__border GameBoxComponent__border--east"
-      :class="{
-        selected: selectedBorders.has('east'),
-      }"
-      @click="$emit('click:border', 'east', position)"
-    ></div>
-    <div
-      class="GameBoxComponent__border GameBoxComponent__border--south"
-      :class="{
-        selected: selectedBorders.has('south'),
-      }"
-      @click="$emit('click:border', 'south', position)"
-    ></div>
-    <div
-      class="GameBoxComponent__border GameBoxComponent__border--west"
-      :class="{
-        selected: selectedBorders.has('west'),
-      }"
-      @click="$emit('click:border', 'west', position)"
+      v-for="externalBorder in externalBorders"
+      :key="externalBorder"
+      :class="`GameBoxComponent__external-border GameBoxComponent__external-border--${externalBorder}`"
     ></div>
   </div>
 </template>
@@ -40,6 +25,7 @@ import { Border, Coordinates } from "@/types";
 interface Props {
   position: Coordinates;
   selectedBorders: Set<Border>;
+  externalBorders: Set<Border>;
 }
 
 interface Events {
@@ -48,10 +34,13 @@ interface Events {
 
 defineProps<Props>();
 defineEmits<Events>();
+
+const borders: Set<Border> = new Set(["north", "east", "south", "west"]);
 </script>
 
 <style lang="scss" scoped>
 .GameBoxComponent {
+  position: relative;
   display: grid;
   grid-template-columns: 10px 1fr 10px;
   grid-template-rows: 10px 1fr 10px;
@@ -91,8 +80,39 @@ defineEmits<Events>();
     }
   }
 
+  &__external-border {
+    background-color: #333;
+    cursor: pointer;
+    box-sizing: border-box;
+    position: absolute;
+
+    &--north {
+      width: calc(100% + 1px);
+      height: 2px;
+      top: -1px;
+    }
+
+    &--east {
+      width: 2px;
+      height: calc(100% + 1px);
+      right: -1px;
+    }
+
+    &--south {
+      width: calc(100% + 1px);
+      height: 2px;
+      bottom: -1px;
+    }
+
+    &--west {
+      width: 2px;
+      height: calc(100% + 1px);
+      left: -1px;
+    }
+  }
+
   .selected {
-    border-width: 3px;
+    border-width: 2px;
   }
 }
 </style>
