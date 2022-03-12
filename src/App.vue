@@ -1,9 +1,9 @@
 <template>
   <div class="wrapper">
     <GameBoxComponent
-      v-for="[pos, box] in gameBoard"
-      :key="pos.toString()"
-      :position="pos"
+      v-for="(box, key) in gameBoard"
+      :key="key"
+      :position="box.position"
       :selected-borders="box.selectedBorders"
       :external-borders="box.externalBorders"
       @click:border="handleBorderClick"
@@ -14,7 +14,7 @@
 <script lang="ts" setup>
 import { reactive } from "vue";
 import GameBoxComponent from "./components/GameBoxComponent.vue";
-import { Border, Coordinates, GameBox } from "./types";
+import { Border, Coordinates, GameBoard, GameBox } from "./types";
 
 const gameBoard = reactive(generateGameBoard(9));
 
@@ -34,13 +34,14 @@ function generateGameBox(
   }
 
   return {
+    position: [col, row],
     selectedBorders: new Set<Border>(externalBorders),
     externalBorders: new Set<Border>(externalBorders),
   };
 }
 
-function generateGameBoard(size: number): Map<Coordinates, GameBox> {
-  const gameBoard: Map<Coordinates, GameBox> = new Map();
+function generateGameBoard(size: number): GameBoard {
+  const gameBoard: GameBoard = {};
   const midPoint = (size + 1) / 2;
 
   let elementsPerRow = 1;
@@ -49,7 +50,8 @@ function generateGameBoard(size: number): Map<Coordinates, GameBox> {
 
     for (let x = 1; x <= elementsPerRow; x++) {
       const gameBox = generateGameBox(x, y, elementsPerRow, midPoint);
-      gameBoard.set([x + offset, y], gameBox);
+      gameBox.position = [x + offset, y];
+      gameBoard[[x + offset, y].toString()] = gameBox;
     }
 
     if (y < midPoint) {
@@ -60,22 +62,6 @@ function generateGameBoard(size: number): Map<Coordinates, GameBox> {
   }
 
   return gameBoard;
-}
-
-function getMapPosition(
-  position: Coordinates,
-  map: Map<Coordinates, GameBox>
-): Coordinates | undefined {
-  let mapPosition;
-
-  for (let key of map.keys()) {
-    if (key[0] === position[0] && key[1] === position[1]) {
-      mapPosition = key;
-      break;
-    }
-  }
-
-  return mapPosition;
 }
 
 function getAdjacentPosition(position: Coordinates, side: Border): Coordinates {
@@ -111,23 +97,17 @@ function handleBorderClick(border: Border, position: Coordinates) {
   const adjacentBoxPosition = getAdjacentPosition(position, border);
   const adjacentBoxBorder = getOppositeBorder(border);
 
-  const targetBox = gameBoard.get(position);
-  console.log(targetBox);
+  const targetBox = gameBoard[position.toString()];
   if (targetBox) {
     targetBox.selectedBorders.add(border);
-    gameBoard.set(position, targetBox);
+    gameBoard[position.toString()] = targetBox;
   }
 
-  const adjacentBox = gameBoard.get(
-    getMapPosition(adjacentBoxPosition, gameBoard) || [0, 0]
-  );
-  console.log(adjacentBox);
+  const adjacentBox = gameBoard[adjacentBoxPosition.toString()];
   if (adjacentBox) {
     adjacentBox.selectedBorders.add(adjacentBoxBorder);
-    gameBoard.set(adjacentBoxPosition, adjacentBox);
+    gameBoard[adjacentBoxPosition.toString()] = adjacentBox;
   }
-
-  console.log(targetBox, adjacentBox);
 }
 </script>
 
