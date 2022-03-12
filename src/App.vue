@@ -1,5 +1,5 @@
 <template>
-  <div class="wrapper">
+  <main class="wrapper">
     <GameBoxComponent
       v-for="(box, key) in store.gameBoard"
       :key="key"
@@ -8,7 +8,7 @@
       :external-borders="box.externalBorders"
       @click:border="handleBorderSelect"
     />
-  </div>
+  </main>
 </template>
 
 <script lang="ts" setup>
@@ -35,7 +35,9 @@ function handleBorderSelect(border: Border, position: Coordinates) {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
+@import "@/assets/scss/reset.scss";
+
 .wrapper {
   display: inline-grid;
   grid-template-columns: repeat(5, 1fr);

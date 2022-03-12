@@ -1,0 +1,62 @@
+// PX => REM
+$em-base: 16px;
+
+@function rem($px) {
+  @if (unitless($px)) {
+    $px: $px * 1px;
+  }
+  @return #{$px / $em-base}rem;
+}
+
+// Media queries
+@mixin start-from($media, $orientation: false) {
+  @if $media == phone {
+    @if $orientation {
+      @media (max-width: $tablet - 1) and (orientation: $orientation) {
+        @content;
+      }
+    } @else {
+      @media (max-width: $tablet - 1) {
+        @content;
+      }
+    }
+  } @else if $media == tablet {
+    @if $orientation {
+      @media (min-width: $tablet) and (orientation: unquote($orientation)) {
+        @content;
+      }
+    } @else {
+      @media (min-width: $tablet) {
+        @content;
+      }
+    }
+  } @else if $media == desktop {
+    @if $orientation {
+      @media (min-width: $desktop) and (orientation: unquote($orientation)) {
+        @content;
+      }
+    } @else {
+      @media (min-width: $desktop) {
+        @content;
+      }
+    }
+  } @else if $media == largedesktop {
+    @if $orientation {
+      @media (min-width: $largedesktop) and (orientation: unquote($orientation)) {
+        @content;
+      }
+    } @else {
+      @media (min-width: $largedesktop) {
+        @content;
+      }
+    }
+  } @else if $media == no-retina {
+    @media screen and (-webkit-max-device-pixel-ratio: 1) {
+      @content;
+    }
+  } @else if $media == retina {
+    @media screen and (-webkit-min-device-pixel-ratio: 2) {
+      @content;
+    }
+  }
+}

@@ -42,11 +42,11 @@ const borders: Set<Border> = new Set(["north", "east", "south", "west"]);
 .GameBoxComponent {
   position: relative;
   display: grid;
-  grid-template-columns: 10px 1fr 10px;
-  grid-template-rows: 10px 1fr 10px;
+  grid-template-columns: rem(10) 1fr rem(10);
+  grid-template-rows: rem(10) 1fr rem(10);
 
-  width: 100px;
-  height: 100px;
+  width: rem(100);
+  height: rem(100);
   margin: -0.5px;
 
   &__border {
