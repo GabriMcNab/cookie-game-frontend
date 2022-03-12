@@ -1,1 +1,2 @@
-export { Coordinates } from "./Coordinates";
+export * from "./GameBox";
+export * from "./Coordinates";
