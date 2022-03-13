@@ -10,7 +10,7 @@ export function generateGameBoard(size: number): GameBoard {
   const gameBoard: GameBoard = {};
   const midPoint = (size + 1) / 2;
 
-  let elementsPerRow = 1;
+  let elementsPerRow = 2;
   for (let y = 1; y <= size; y++) {
     const offset = (size - elementsPerRow) / 2;
 
@@ -20,9 +20,9 @@ export function generateGameBoard(size: number): GameBoard {
       gameBoard[position.toString()] = { ...gameBox, position };
     }
 
-    if (y < midPoint) {
+    if (y < midPoint - 1) {
       elementsPerRow += 2;
-    } else {
+    } else if (y > midPoint) {
       elementsPerRow -= 2;
     }
   }

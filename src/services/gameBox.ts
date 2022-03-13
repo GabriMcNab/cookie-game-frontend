@@ -1,4 +1,4 @@
-import { Border, GameBox } from "@/types";
+import { Border, GameBox, Player } from "@/types";
 
 /**
  * Generates a new GameBox. It sets the borders if the GameBox is one of the boxes on the edge of the GameBoard
@@ -43,4 +43,25 @@ export function getOppositeBorder(border: Border): Border {
     south: "north",
   };
   return oppositeBorders[border];
+}
+
+/**
+ * Updates the GameBox by setting the selectedBorders and checking if it's completed
+ * @param box GameBox to update
+ * @param border Border clicked
+ * @param player Current active player
+ * @returns Updated GameBox
+ */
+export function updateGameBox(
+  box: GameBox,
+  border: Border,
+  player: Player
+): GameBox {
+  box.selectedBorders.add(border);
+
+  if (box.selectedBorders.size === 4) {
+    box.completedBy = player;
+  }
+
+  return box;
 }

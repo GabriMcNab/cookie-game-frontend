@@ -1,27 +1,40 @@
 import { defineStore } from "pinia";
-import { Border, Coordinates, GameBoard } from "@/types";
+import { getOppositeBorder, updateGameBox } from "@/services/gameBox";
+import { getAdjacentGameBoxPosition } from "@/services/gameBoard";
+import { Border, Coordinates, GameBoard, Player } from "@/types";
 
 export const useBoardStore = defineStore("board", {
   state: () => ({
     gameBoard: {} as GameBoard,
+    activePlayer: "p1" as Player,
   }),
   actions: {
     /**
-     * Updates the borders of a GameBox
-     * @param boxPosition Position of the GameBox to update
-     * @param border Border to add to the Set<Border>
+     * Handles the player's move by updating the corresponding game boxes
+     * @param position Position of the GameBox clicked
+     * @param border Border clicked
      */
-    updateGameBoxBorders(boxPosition: Coordinates, border: Border) {
-      const targetBox = this.gameBoard[boxPosition.toString()];
-      if (targetBox) {
-        targetBox.selectedBorders.add(border);
+    setPlayerMove(border: Border, position: Coordinates) {
+      const targetBox = this.gameBoard[position.toString()];
+      const updatedBox = updateGameBox(targetBox, border, this.activePlayer);
 
-        if (targetBox.selectedBorders.size === 4) {
-          targetBox.completedBy = "p2";
-        }
+      const adjBoxPosition = getAdjacentGameBoxPosition(position, border);
+      const adjBorder = getOppositeBorder(border);
+      const adjBox = this.gameBoard[adjBoxPosition.toString()];
+      const updatedAdjBox = updateGameBox(adjBox, adjBorder, this.activePlayer);
 
-        this.gameBoard[boxPosition.toString()] = targetBox;
+      if (!updatedBox.completedBy && !updatedAdjBox.completedBy) {
+        this.toggleActivePlayer();
       }
+
+      this.gameBoard[position.toString()] = updatedBox;
+      this.gameBoard[adjBoxPosition.toString()] = updatedAdjBox;
+    },
+    /**
+     * Updates activePlayer to next player
+     */
+    toggleActivePlayer() {
+      this.activePlayer = this.activePlayer === "p1" ? "p2" : "p1";
     },
   },
 });

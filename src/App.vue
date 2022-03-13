@@ -1,39 +1,40 @@
 <template>
-  <main class="wrapper">
-    <GameBoxComponent
-      v-for="(box, key) in store.gameBoard"
-      :key="key"
-      :position="box.position"
-      :selected-borders="box.selectedBorders"
-      :external-borders="box.externalBorders"
-      :completed-by="box.completedBy"
-      @click:border="handleBorderSelect"
-    />
+  <main>
+    <h1>
+      Current Player:
+      <span
+        :style="{
+          color: store.activePlayer === 'p1' ? 'orangered' : 'dodgerBlue',
+        }"
+        >{{ currentPlayer }}</span
+      >
+    </h1>
+    <div class="wrapper">
+      <GameBoxComponent
+        v-for="(box, key) in store.gameBoard"
+        :key="key"
+        :position="box.position"
+        :selected-borders="box.selectedBorders"
+        :external-borders="box.externalBorders"
+        :completed-by="box.completedBy"
+        @click:border="store.setPlayerMove"
+      />
+    </div>
   </main>
 </template>
 
 <script lang="ts" setup>
+import { computed } from "vue";
 import GameBoxComponent from "@/components/GameBoxComponent.vue";
+import { generateGameBoard } from "@/services/gameBoard";
 import { useBoardStore } from "@/stores/board";
 
-import { getOppositeBorder } from "@/services/gameBox";
-import {
-  generateGameBoard,
-  getAdjacentGameBoxPosition,
-} from "@/services/gameBoard";
-
-import { Border, Coordinates } from "@/types";
-
 const store = useBoardStore();
-store.$state = { gameBoard: generateGameBoard(9) };
+store.$state = { gameBoard: generateGameBoard(8), activePlayer: "p1" };
 
-function handleBorderSelect(border: Border, position: Coordinates) {
-  const adjacentBoxPosition = getAdjacentGameBoxPosition(position, border);
-  const adjacentBoxBorder = getOppositeBorder(border);
-
-  store.updateGameBoxBorders(position, border);
-  store.updateGameBoxBorders(adjacentBoxPosition, adjacentBoxBorder);
-}
+const currentPlayer = computed(() => {
+  return store.activePlayer === "p1" ? "Player 1" : "Player 2";
+});
 </script>
 
 <style lang="scss">
