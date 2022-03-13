@@ -8,34 +8,41 @@
       :key="border"
       :class="`GameBoxComponent__border GameBoxComponent__border--${border} ${
         selectedBorders.has(border) ? 'selected' : ''
-      }`"
-      @click="$emit('click:border', border, position)"
+      } ${externalBorders.has(border) ? `external--${border}` : ''}`"
+      @click="() => handleBorderClick(border)"
     ></div>
-    <div
-      v-for="externalBorder in externalBorders"
-      :key="externalBorder"
-      :class="`GameBoxComponent__external-border GameBoxComponent__external-border--${externalBorder}`"
-    ></div>
+
+    <CrossSvg v-if="completedBy === 'p1'" />
+    <OvalSvg v-if="completedBy === 'p2'" />
   </div>
 </template>
 
 <script lang="ts" setup>
-import { Border, Coordinates } from "@/types";
+import CrossSvg from "@/assets/svg/cross.svg";
+import OvalSvg from "@/assets/svg/oval.svg";
+import { Border, Coordinates, Player } from "@/types";
 
 interface Props {
   position: Coordinates;
   selectedBorders: Set<Border>;
   externalBorders: Set<Border>;
+  completedBy?: Player;
 }
 
 interface Events {
   (e: "click:border", border: Border, position: Coordinates): void;
 }
 
-defineProps<Props>();
-defineEmits<Events>();
+const props = defineProps<Props>();
+const emit = defineEmits<Events>();
 
 const borders: Set<Border> = new Set(["north", "east", "south", "west"]);
+
+function handleBorderClick(border: Border) {
+  if (!props.selectedBorders.has(border)) {
+    emit("click:border", border, props.position);
+  }
+}
 </script>
 
 <style lang="scss" scoped>
@@ -80,39 +87,45 @@ const borders: Set<Border> = new Set(["north", "east", "south", "west"]);
     }
   }
 
-  &__external-border {
-    background-color: #333;
-    cursor: pointer;
-    box-sizing: border-box;
-    position: absolute;
+  .selected {
+    border-width: 2px;
+    cursor: default;
+    pointer-events: none;
+  }
 
-    &--north {
-      width: calc(100% + 1px);
-      height: 2px;
-      top: -1px;
-    }
-
-    &--east {
-      width: 2px;
-      height: calc(100% + 1px);
-      right: -1px;
-    }
-
-    &--south {
-      width: calc(100% + 1px);
-      height: 2px;
-      bottom: -1px;
-    }
-
-    &--west {
-      width: 2px;
-      height: calc(100% + 1px);
-      left: -1px;
+  .external--north,
+  .external--east,
+  .external--south,
+  .external--west {
+    &::before {
+      content: "";
+      position: absolute;
+      background-color: #333;
     }
   }
 
-  .selected {
-    border-width: 2px;
+  .external--north::before {
+    width: calc(100% + 1px);
+    height: 2px;
+    top: -1px;
+  }
+
+  .external--east::before {
+    width: 2px;
+    height: calc(100% + 1px);
+    right: -1px;
+  }
+
+  .external--south::before {
+    width: calc(100% + 1px);
+    height: 2px;
+    bottom: -1px;
+  }
+
+  .external--west::before {
+    width: 2px;
+    height: calc(100% + 1px);
+    left: -1px;
   }
 }
 </style>

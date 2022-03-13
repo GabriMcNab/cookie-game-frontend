@@ -15,6 +15,11 @@ export const useBoardStore = defineStore("board", {
       const targetBox = this.gameBoard[boxPosition.toString()];
       if (targetBox) {
         targetBox.selectedBorders.add(border);
+
+        if (targetBox.selectedBorders.size === 4) {
+          targetBox.completedBy = "p2";
+        }
+
         this.gameBoard[boxPosition.toString()] = targetBox;
       }
     },

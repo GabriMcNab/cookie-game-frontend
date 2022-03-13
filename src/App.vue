@@ -6,6 +6,7 @@
       :position="box.position"
       :selected-borders="box.selectedBorders"
       :external-borders="box.externalBorders"
+      :completed-by="box.completedBy"
       @click:border="handleBorderSelect"
     />
   </main>
