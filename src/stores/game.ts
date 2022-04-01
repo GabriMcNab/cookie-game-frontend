@@ -5,9 +5,9 @@ import { Border, Coordinates, GameBoard, Player } from "@/types";
 
 export const useGameStore = defineStore("game", {
   state: () => ({
-    player: {} as Player | undefined,
+    player: undefined as Player | undefined,
     board: {} as GameBoard,
-    activePlayer: {} as Player,
+    activePlayer: undefined as Player | undefined,
     gameReady: false,
   }),
   actions: {
@@ -18,12 +18,20 @@ export const useGameStore = defineStore("game", {
      */
     setPlayerMove(border: Border, position: Coordinates) {
       const targetBox = this.board[position.toString()];
-      const updatedBox = updateGameBox(targetBox, border, this.activePlayer);
+      const updatedBox = updateGameBox(
+        targetBox,
+        border,
+        this.activePlayer ?? { id: "", number: 1 }
+      );
 
       const adjBoxPosition = getAdjacentGameBoxPosition(position, border);
       const adjBorder = getOppositeBorder(border);
       const adjBox = this.board[adjBoxPosition.toString()];
-      const updatedAdjBox = updateGameBox(adjBox, adjBorder, this.activePlayer);
+      const updatedAdjBox = updateGameBox(
+        adjBox,
+        adjBorder,
+        this.activePlayer ?? { id: "", number: 1 }
+      );
 
       if (!updatedBox.completedBy && !updatedAdjBox.completedBy) {
         //this.toggleActivePlayer();
