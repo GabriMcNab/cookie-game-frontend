@@ -1,1 +1,4 @@
-export type Player = "p1" | "p2";
+export type Player = {
+  id: string;
+  number: 1 | 2;
+};

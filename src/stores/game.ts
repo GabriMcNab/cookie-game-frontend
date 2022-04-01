@@ -5,8 +5,10 @@ import { Border, Coordinates, GameBoard, Player } from "@/types";
 
 export const useGameStore = defineStore("game", {
   state: () => ({
+    player: {} as Player | undefined,
     board: {} as GameBoard,
-    activePlayer: "p1" as Player,
+    activePlayer: {} as Player,
+    gameReady: false,
   }),
   actions: {
     /**
@@ -24,17 +26,11 @@ export const useGameStore = defineStore("game", {
       const updatedAdjBox = updateGameBox(adjBox, adjBorder, this.activePlayer);
 
       if (!updatedBox.completedBy && !updatedAdjBox.completedBy) {
-        this.toggleActivePlayer();
+        //this.toggleActivePlayer();
       }
 
       this.board[position.toString()] = updatedBox;
       this.board[adjBoxPosition.toString()] = updatedAdjBox;
-    },
-    /**
-     * Updates activePlayer to next player
-     */
-    toggleActivePlayer() {
-      this.activePlayer = this.activePlayer === "p1" ? "p2" : "p1";
     },
   },
 });

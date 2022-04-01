@@ -12,8 +12,8 @@
       @click="() => handleBorderClick(border)"
     ></div>
 
-    <CrossSvg v-if="completedBy === 'p1'" />
-    <OvalSvg v-if="completedBy === 'p2'" />
+    <CrossSvg v-if="completedBy === 1" />
+    <OvalSvg v-if="completedBy === 2" />
   </div>
 </template>
 
@@ -26,7 +26,7 @@ interface Props {
   position: Coordinates;
   selectedBorders: Array<Border>;
   externalBorders: Array<Border>;
-  completedBy?: Player;
+  completedBy?: Player["number"];
 }
 
 interface Events {
