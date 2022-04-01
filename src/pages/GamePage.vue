@@ -27,38 +27,26 @@
 <script lang="ts" setup>
 import { onBeforeMount } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { io, Socket } from "socket.io-client";
 import GameBoard from "@/components/GameBoard.vue";
 import { useGameStore } from "@/stores/game";
-import { GameState } from "@/types";
 
 const store = useGameStore();
 const route = useRoute();
 const router = useRouter();
-const gameId = route.params.id;
-let socket: Socket;
+const gameId = route.params.id as string;
+
+store.$onAction(({ name, onError }) => {
+  if (name === "joinGame") {
+    onError((err) => {
+      console.error(err);
+      router.push("/");
+    });
+  }
+});
 
 onBeforeMount(() => {
-  socket = io("http://localhost:5000");
-
-  socket.emit(
-    "joinGame",
-    gameId,
-    ({ status, gameState }: { status: string; gameState: GameState }) => {
-      if (status === "KO") {
-        console.error("Something is wrong!");
-        router.push("/");
-      } else {
-        store.player = gameState.players.find((p) => p.id === socket.id);
-        store.activePlayer = gameState.activePlayer;
-        store.board = gameState.board;
-      }
-    }
-  );
-
-  socket.on("gameReady", (gameReady: boolean) => {
-    store.gameReady = gameReady;
-  });
+  store.initSocket();
+  store.joinGame(gameId);
 });
 </script>
 
