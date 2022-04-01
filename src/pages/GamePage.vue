@@ -35,18 +35,12 @@ const route = useRoute();
 const router = useRouter();
 const gameId = route.params.id as string;
 
-store.$onAction(({ name, onError }) => {
-  if (name === "joinGame") {
-    onError((err) => {
-      console.error(err);
-      router.push("/");
-    });
-  }
-});
-
 onBeforeMount(() => {
   store.initSocket();
-  store.joinGame(gameId);
+  store.joinGame(gameId).catch((err) => {
+    console.error(err);
+    router.push("/");
+  });
 });
 </script>
 

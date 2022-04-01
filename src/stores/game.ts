@@ -1,7 +1,5 @@
 import { defineStore } from "pinia";
 import { io, Socket } from "socket.io-client";
-import { getOppositeBorder, updateGameBox } from "@/services/gameBox";
-import { getAdjacentGameBoxPosition } from "@/services/gameBoard";
 import { Border, Coordinates, GameBoard, GameState, Player } from "@/types";
 
 export const useGameStore = defineStore("game", {
@@ -14,35 +12,6 @@ export const useGameStore = defineStore("game", {
   }),
   actions: {
     /**
-     * Handles the player's move by updating the corresponding game boxes
-     * @param position Position of the GameBox clicked
-     * @param border Border clicked
-     */
-    setPlayerMove(border: Border, position: Coordinates) {
-      const targetBox = this.board[position.toString()];
-      const updatedBox = updateGameBox(
-        targetBox,
-        border,
-        this.activePlayer ?? { id: "", number: 1 }
-      );
-
-      const adjBoxPosition = getAdjacentGameBoxPosition(position, border);
-      const adjBorder = getOppositeBorder(border);
-      const adjBox = this.board[adjBoxPosition.toString()];
-      const updatedAdjBox = updateGameBox(
-        adjBox,
-        adjBorder,
-        this.activePlayer ?? { id: "", number: 1 }
-      );
-
-      if (!updatedBox.completedBy && !updatedAdjBox.completedBy) {
-        //this.toggleActivePlayer();
-      }
-
-      this.board[position.toString()] = updatedBox;
-      this.board[adjBoxPosition.toString()] = updatedAdjBox;
-    },
-    /**
      * Method used to initialize a new socket connection
      */
     initSocket() {
@@ -52,28 +21,64 @@ export const useGameStore = defineStore("game", {
         this.socket.on("gameReady", (gameReady: boolean) => {
           this.gameReady = gameReady;
         });
+
+        this.socket.on("gameUpdated", (game: GameState) => {
+          this.board = game.board;
+          this.activePlayer = game.activePlayer;
+        });
       }
     },
     /**
      * Emits a socket event to join a game
      * @param gameId ID of the game
      */
-    joinGame(gameId: string) {
-      this.socket?.emit(
-        "joinGame",
-        gameId,
-        ({ status, gameState }: { status: string; gameState: GameState }) => {
-          if (status === "KO") {
-            throw new Error("Could not join the game!");
-          } else {
-            this.player = gameState.players.find(
-              (p) => p.id === this.socket?.id
-            );
-            this.activePlayer = gameState.activePlayer;
-            this.board = gameState.board;
+    joinGame(gameId: string): Promise<void> {
+      return new Promise((resolve, reject) => {
+        this.socket?.emit(
+          "joinGame",
+          gameId,
+          ({
+            status,
+            gameState,
+          }: {
+            status: "OK" | "KO";
+            gameState: GameState;
+          }) => {
+            if (status === "KO") {
+              reject("Could not join the game!");
+            } else {
+              this.player = gameState.players.find(
+                (p) => p.id === this.socket?.id
+              );
+              this.activePlayer = gameState.activePlayer;
+              this.board = gameState.board;
+              resolve();
+            }
           }
-        }
-      );
+        );
+      });
+    },
+    /**
+     * Emits a socket event to update the board with the player's move
+     * @param position Position of the GameBox clicked
+     * @param border Border clicked
+     */
+    setPlayerMove(border: Border, position: Coordinates) {
+      if (
+        this.socket &&
+        this.gameReady &&
+        this.activePlayer?.id === this.player?.id
+      ) {
+        this.socket.emit(
+          "playerMove",
+          { border, position },
+          ({ status }: { status: "OK" | "KO" }) => {
+            if (status === "KO") {
+              console.error("Error while setting the player's move!");
+            }
+          }
+        );
+      }
     },
   },
 });
