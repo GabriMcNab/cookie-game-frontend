@@ -1,14 +1,14 @@
 <template>
   <div
-    class="GameBoxComponent"
+    class="GameBox"
     :style="{ gridColumn: position[0], gridRow: position[1] }"
   >
     <div
       v-for="border in borders"
       :key="border"
-      :class="`GameBoxComponent__border GameBoxComponent__border--${border} ${
-        selectedBorders.has(border) ? 'selected' : ''
-      } ${externalBorders.has(border) ? `external--${border}` : ''}`"
+      :class="`GameBox__border GameBox__border--${border} ${
+        selectedBorders.includes(border) ? 'selected' : ''
+      } ${externalBorders.includes(border) ? `external--${border}` : ''}`"
       @click="() => handleBorderClick(border)"
     ></div>
 
@@ -24,8 +24,8 @@ import { Border, Coordinates, Player } from "@/types";
 
 interface Props {
   position: Coordinates;
-  selectedBorders: Set<Border>;
-  externalBorders: Set<Border>;
+  selectedBorders: Array<Border>;
+  externalBorders: Array<Border>;
   completedBy?: Player;
 }
 
@@ -36,17 +36,17 @@ interface Events {
 const props = defineProps<Props>();
 const emit = defineEmits<Events>();
 
-const borders: Set<Border> = new Set(["north", "east", "south", "west"]);
+const borders: Array<Border> = ["north", "east", "south", "west"];
 
 function handleBorderClick(border: Border) {
-  if (!props.selectedBorders.has(border)) {
+  if (!props.selectedBorders.includes(border)) {
     emit("click:border", border, props.position);
   }
 }
 </script>
 
 <style lang="scss" scoped>
-.GameBoxComponent {
+.GameBox {
   position: relative;
   display: grid;
   grid-template-columns: rem(10) 1fr rem(10);

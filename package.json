@@ -1,7 +1,13 @@
 {
-  "name": "vue-cookie-game",
+  "name": "cookie-game",
+  "description": "Simple HTML5 game",
   "private": true,
   "version": "0.0.0",
+  "author": "Gabriele Fazio",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GabriMcNab/cookie-game-frontend"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
@@ -10,7 +16,9 @@
   },
   "dependencies": {
     "pinia": "^2.0.11",
-    "vue": "^3.2.25"
+    "socket.io-client": "^4.4.1",
+    "vue": "^3.2.25",
+    "vue-router": "^4.0.14"
   },
   "devDependencies": {
     "@types/node": "^17.0.21",

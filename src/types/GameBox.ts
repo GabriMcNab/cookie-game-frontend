@@ -5,7 +5,7 @@ export type Border = "north" | "east" | "south" | "west";
 
 export type GameBox = {
   position: Coordinates;
-  selectedBorders: Set<Border>;
-  externalBorders: Set<Border>;
+  selectedBorders: Array<Border>;
+  externalBorders: Array<Border>;
   completedBy?: Player;
 };
