@@ -5,9 +5,10 @@ import { Border, Coordinates, GameBoard, GameState, Player } from "@/types";
 export const useGameStore = defineStore("game", {
   state: () => ({
     socket: undefined as Socket | undefined,
-    player: undefined as Player | undefined,
     board: {} as GameBoard,
+    playerNumber: undefined as Player["number"] | undefined,
     activePlayer: undefined as Player["number"] | undefined,
+    players: [] as Player[],
     gameReady: false,
   }),
   actions: {
@@ -25,6 +26,7 @@ export const useGameStore = defineStore("game", {
         this.socket.on("gameUpdated", (game: GameState) => {
           this.board = game.board;
           this.activePlayer = game.activePlayer;
+          this.players = game.players;
         });
       }
     },
@@ -47,9 +49,9 @@ export const useGameStore = defineStore("game", {
             if (status === "KO") {
               reject("Could not join the game!");
             } else {
-              this.player = gameState.players.find(
+              this.playerNumber = gameState.players.find(
                 (p) => p.id === this.socket?.id
-              );
+              )?.number;
               this.activePlayer = gameState.activePlayer;
               this.board = gameState.board;
               resolve();
@@ -67,7 +69,7 @@ export const useGameStore = defineStore("game", {
       if (
         this.socket &&
         this.gameReady &&
-        this.activePlayer === this.player?.number
+        this.activePlayer === this.playerNumber
       ) {
         this.socket.emit(
           "playerMove",

@@ -1,20 +1,24 @@
 <template>
-  <main>
-    <h1>
-      You're
-      <span
-        :class="`GamePage__player-tag GamePage__player-tag--p${store.player?.number}`"
-        >Player {{ store.player?.number }}</span
-      >
-    </h1>
-    <h1 v-if="store.activePlayer">
-      Current Player:
-      <span
-        :class="`GamePage__player-tag GamePage__player-tag--p${store.activePlayer}`"
-        >Player {{ store.activePlayer }}</span
-      >
-    </h1>
-    <h2>Game Ready: {{ store.gameReady.toString() }}</h2>
+  <main class="GamePage">
+    <aside>
+      <h1>
+        You're
+        <span
+          :class="`GamePage__player-tag GamePage__player-tag--p${store.playerNumber}`"
+          >Player {{ store.playerNumber }}</span
+        >
+      </h1>
+      <h1 v-if="store.activePlayer">
+        Current Player:
+        <span
+          :class="`GamePage__player-tag GamePage__player-tag--p${store.activePlayer}`"
+          >Player {{ store.activePlayer }}</span
+        >
+      </h1>
+      <h2 v-for="player in store.players" :key="player.id">
+        Player {{ player.number }} score: {{ player.score }}
+      </h2>
+    </aside>
     <dialog v-if="!store.gameReady" :open="!store.gameReady">
       <h2>Waiting for other players</h2>
       <h3>Invite other players to join</h3>
@@ -46,6 +50,11 @@ onBeforeMount(() => {
 
 <style lang="scss" scoped>
 .GamePage {
+  padding: 50px 80px;
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: space-between;
+
   &__player-tag {
     &--p1 {
       color: orangered;
