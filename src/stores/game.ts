@@ -7,7 +7,7 @@ export const useGameStore = defineStore("game", {
     socket: undefined as Socket | undefined,
     player: undefined as Player | undefined,
     board: {} as GameBoard,
-    activePlayer: undefined as Player | undefined,
+    activePlayer: undefined as Player["number"] | undefined,
     gameReady: false,
   }),
   actions: {
@@ -67,7 +67,7 @@ export const useGameStore = defineStore("game", {
       if (
         this.socket &&
         this.gameReady &&
-        this.activePlayer?.id === this.player?.id
+        this.activePlayer === this.player?.number
       ) {
         this.socket.emit(
           "playerMove",

@@ -10,8 +10,8 @@
     <h1 v-if="store.activePlayer">
       Current Player:
       <span
-        :class="`GamePage__player-tag GamePage__player-tag--p${store.activePlayer.number}`"
-        >Player {{ store.activePlayer.number }}</span
+        :class="`GamePage__player-tag GamePage__player-tag--p${store.activePlayer}`"
+        >Player {{ store.activePlayer }}</span
       >
     </h1>
     <h2>Game Ready: {{ store.gameReady.toString() }}</h2>
