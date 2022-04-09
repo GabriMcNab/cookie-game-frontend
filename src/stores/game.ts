@@ -3,14 +3,20 @@ import { io, Socket } from "socket.io-client";
 import { Border, Coordinates, GameBoard, GameState, Player } from "@/types";
 
 export const useGameStore = defineStore("game", {
-  state: () => ({
+  state: (): { game: GameState; socket?: Socket } => ({
     socket: undefined as Socket | undefined,
-    board: {} as GameBoard,
-    playerNumber: undefined as Player["number"] | undefined,
-    activePlayer: undefined as Player["number"] | undefined,
-    players: [] as Player[],
-    gameReady: false,
+    game: {
+      board: {} as GameBoard,
+      activePlayer: undefined as Player["number"] | undefined,
+      players: [] as Player[],
+      gameReady: false,
+      gameOver: false,
+    },
   }),
+  getters: {
+    playerNumber: (state) =>
+      state.game.players.find((p) => p.id === state.socket?.id)?.number,
+  },
   actions: {
     /**
      * Method used to initialize a new socket connection
@@ -19,41 +25,37 @@ export const useGameStore = defineStore("game", {
       if (!this.socket) {
         this.socket = io("http://localhost:5000");
 
-        this.socket.on("gameReady", (gameReady: boolean) => {
-          this.gameReady = gameReady;
+        this.socket.on("playerJoined", (game: GameState) => {
+          console.log("player joined");
+          this.game = game;
         });
 
         this.socket.on("gameUpdated", (game: GameState) => {
-          this.board = game.board;
-          this.activePlayer = game.activePlayer;
-          this.players = game.players;
+          this.game = game;
         });
       }
     },
     /**
+     * Used to manually disconnect socket from server
+     */
+    disconnectSocket() {
+      this.socket?.disconnect();
+      this.socket = undefined;
+    },
+    /**
      * Emits a socket event to join a game
      * @param gameId ID of the game
+     * @returns Promise
      */
     joinGame(gameId: string): Promise<void> {
       return new Promise((resolve, reject) => {
         this.socket?.emit(
           "joinGame",
           gameId,
-          ({
-            status,
-            gameState,
-          }: {
-            status: "OK" | "KO";
-            gameState: GameState;
-          }) => {
+          ({ status }: { status: "OK" | "KO" }) => {
             if (status === "KO") {
               reject("Could not join the game!");
             } else {
-              this.playerNumber = gameState.players.find(
-                (p) => p.id === this.socket?.id
-              )?.number;
-              this.activePlayer = gameState.activePlayer;
-              this.board = gameState.board;
               resolve();
             }
           }
@@ -68,8 +70,8 @@ export const useGameStore = defineStore("game", {
     setPlayerMove(border: Border, position: Coordinates) {
       if (
         this.socket &&
-        this.gameReady &&
-        this.activePlayer === this.playerNumber
+        this.game.gameReady &&
+        this.game.activePlayer === this.playerNumber
       ) {
         this.socket.emit(
           "playerMove",

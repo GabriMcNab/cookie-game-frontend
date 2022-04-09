@@ -4,22 +4,33 @@
       <h1>
         You're
         <span
-          :class="`GamePage__player-tag GamePage__player-tag--p${store.playerNumber}`"
-          >Player {{ store.playerNumber }}</span
+          :class="`GamePage__player-tag GamePage__player-tag--p${playerNumber}`"
+          >Player {{ playerNumber }}</span
         >
       </h1>
-      <h1 v-if="store.activePlayer">
+      <h1 v-if="game.activePlayer">
         Current Player:
         <span
-          :class="`GamePage__player-tag GamePage__player-tag--p${store.activePlayer}`"
-          >Player {{ store.activePlayer }}</span
+          :class="`GamePage__player-tag GamePage__player-tag--p${game.activePlayer}`"
+          >Player {{ game.activePlayer }}</span
         >
       </h1>
-      <h2 v-for="player in store.players" :key="player.id">
+      <h2 v-for="player in game.players" :key="player.id">
         Player {{ player.number }} score: {{ player.score }}
       </h2>
     </aside>
-    <dialog v-if="!store.gameReady" :open="!store.gameReady">
+    <dialog v-if="game.gameOver" :open="game.gameOver">
+      <h2>Game Over</h2>
+      <h3 v-if="winningPlayer">Player {{ winningPlayer }} wins!</h3>
+      <h3 v-else>Draw!</h3>
+      <ul>
+        <li v-for="player in game.players" :key="player.id">
+          Player {{ player.number }} score: {{ player.score }}
+        </li>
+      </ul>
+      <button @click="router.push('/')">Exit</button>
+    </dialog>
+    <dialog v-else-if="!game.gameReady" :open="!game.gameReady">
       <h2>Waiting for other players</h2>
       <h3>Invite other players to join</h3>
       <p>Game ID: {{ route.params.id }}</p>
@@ -29,22 +40,50 @@
 </template>
 
 <script lang="ts" setup>
-import { onBeforeMount } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { computed, onBeforeMount } from "vue";
+import {
+  onBeforeRouteLeave,
+  onBeforeRouteUpdate,
+  useRoute,
+  useRouter,
+} from "vue-router";
+import { storeToRefs } from "pinia";
 import GameBoard from "@/components/GameBoard.vue";
 import { useGameStore } from "@/stores/game";
 
 const store = useGameStore();
+const { game, playerNumber } = storeToRefs(store);
 const route = useRoute();
 const router = useRouter();
 const gameId = route.params.id as string;
 
-onBeforeMount(() => {
+const initializeGame = () => {
+  console.log("init");
   store.initSocket();
   store.joinGame(gameId).catch((err) => {
     console.error(err);
     router.push("/");
   });
+};
+
+onBeforeMount(initializeGame);
+onBeforeRouteUpdate(initializeGame);
+
+onBeforeRouteLeave(store.disconnectSocket);
+
+const winningPlayer = computed(() => {
+  const playersScore = game.value.players.map((p) => p.score);
+
+  if (playersScore.every((s) => s === playersScore[0])) {
+    return;
+  }
+
+  const maxScore = Math.max(...playersScore);
+  const playerWithHighestScore = game.value.players.find(
+    (p) => p.score === maxScore
+  );
+
+  return playerWithHighestScore?.number;
 });
 </script>
 

@@ -1,7 +1,7 @@
 <template>
   <div class="wrapper">
     <GameBox
-      v-for="(box, key) in store.board"
+      v-for="(box, key) in store.game.board"
       :key="key"
       :position="box.position"
       :selected-borders="box.selectedBorders"
