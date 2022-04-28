@@ -1,5 +1,5 @@
 <template>
-  <div class="wrapper">
+  <div class="GameBoard" data-testid="game-board">
     <GameBox
       v-for="(box, key) in store.game.board"
       :key="key"
@@ -20,7 +20,7 @@ const store = useGameStore();
 </script>
 
 <style lang="scss">
-.wrapper {
+.GameBoard {
   display: inline-grid;
   grid-template-columns: repeat(5, 1fr);
   grid-template-rows: repeat(5, 1fr);

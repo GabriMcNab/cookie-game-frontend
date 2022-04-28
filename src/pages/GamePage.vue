@@ -15,7 +15,11 @@
           >Player {{ game.activePlayer }}</span
         >
       </h1>
-      <h2 v-for="player in game.players" :key="player.id">
+      <h2
+        v-for="player in game.players"
+        :key="player.id"
+        :data-testid="`game-score-player-${player.number}`"
+      >
         Player {{ player.number }} score: {{ player.score }}
       </h2>
     </aside>
@@ -24,13 +28,21 @@
       <h3 v-if="winningPlayer">Player {{ winningPlayer }} wins!</h3>
       <h3 v-else>Draw!</h3>
       <ul>
-        <li v-for="player in game.players" :key="player.id">
+        <li
+          v-for="player in game.players"
+          :key="player.id"
+          :data-testid="`game-score-player-${player.number}`"
+        >
           Player {{ player.number }} score: {{ player.score }}
         </li>
       </ul>
       <button @click="router.push('/')">Exit</button>
     </dialog>
-    <dialog v-else-if="!game.gameReady" :open="!game.gameReady">
+    <dialog
+      v-else-if="!game.gameReady"
+      :open="!game.gameReady"
+      data-testid="wait-player-dialog"
+    >
       <h2>Waiting for other players</h2>
       <h3>Invite other players to join</h3>
       <p>Game ID: {{ route.params.id }}</p>

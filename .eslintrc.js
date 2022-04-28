@@ -7,6 +7,7 @@ module.exports = {
     "vue/setup-compiler-macros": true,
   },
   extends: [
+    "plugin:cypress/recommended",
     "plugin:vue/vue3-recommended",
     "eslint:recommended",
     "@vue/typescript/recommended",

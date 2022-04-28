@@ -3,7 +3,11 @@
     <h1>Welcome to the cookie game!</h1>
     <h2>Create a new game</h2>
     <form>
-      <button type="submit" @click.prevent="handleCreateNewGame">
+      <button
+        type="submit"
+        data-testid="create-game-button"
+        @click.prevent="handleCreateNewGame"
+      >
         Create new game
       </button>
     </form>

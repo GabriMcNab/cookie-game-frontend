@@ -2,6 +2,7 @@
   <div
     class="GameBox"
     :style="{ gridColumn: position[0], gridRow: position[1] }"
+    :data-testid="`game-box-${position[0]}-${position[1]}`"
   >
     <div
       v-for="border in borders"
@@ -9,6 +10,7 @@
       :class="`GameBox__border GameBox__border--${border} ${
         selectedBorders.includes(border) ? 'selected' : ''
       } ${externalBorders.includes(border) ? `external--${border}` : ''}`"
+      :data-testid="`game-box-border-${position[0]}-${position[1]}-${border}`"
       @click="() => handleBorderClick(border)"
     ></div>
 
